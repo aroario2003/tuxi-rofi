@@ -19,6 +19,11 @@
 #This script intends to be an extension of his script and make it easier for tuxi to be a part of everyones workflow.# 
 ######################################################################################################################
 
+#####################
+#                   #
+#     variables     #
+#                   #
+#####################
 DEST="/home/$USER"
 
 ####################
@@ -145,30 +150,30 @@ exit 0
 #######################
 while getopts "hunvid" OPT; do
 	case "$OPT" in 
-    h) 
+        h|help) 
 	   help_dialouge
 	   exit 0
 	   ;;
-	u) 
-       url_print
+	u|url) 
+           url_print
 	   exit 0
 	   ;;
-	n)
+	n|notification)
 	   notif_only
-       exit 0
-       ;;
-    v) 
-       verbose
-       exit 0
-       ;;
-    i)
-       install_tuxi
-       exit 0
-       ;;
-    d)
-      DEST="$2"
-      shift
-      ;;
+           exit 0
+           ;;
+        v|verbose) 
+           verbose
+           exit 0
+           ;;
+        i|install-tuxi)
+           install_tuxi
+           exit 0
+           ;;
+        d|destination)
+           DEST="$2"
+           shift
+           ;;
       esac
 done     
 
