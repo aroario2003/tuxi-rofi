@@ -19,6 +19,8 @@
 #This script intends to be an extension of his script and make it easier for tuxi to be a part of everyones workflow.# 
 ######################################################################################################################
 
+DEST="/home/$USER"
+
 ####################
 #                  #
 #   colors help    #
@@ -57,6 +59,7 @@ help_dialouge() {
 	printf "   %b-n%b              %bPrint only the result found by tuxi, no links%b\n" "$green" "$white"
         printf "   %b-v%b              %bPrint output mainly to the terminal, this option is meant for debugging%b\n" "$green" "$white"
         printf "   %b-i%b              %bInstall tuxi on your system%b\n" "$green" "$white"
+        printf "   %b-d%b              %bSet the destination for files result.txt and query.txt to be put, make sure that this flag is the first argument if being used!\n%b" "$green" "$white"
         printf "%bCredit for Tuxi goes to BugsWritter at%b %bhttps://github.com/Bugswriter/tuxi\n%b" "$yellow" "$blue"
 
 }
@@ -68,11 +71,11 @@ help_dialouge() {
 ##################
 url_print() {
 
-rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "Search: " -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "Search: " -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > $DEST/query.txt
 
-tuxi -r -u $(cat ~/query.txt) > ~/result.txt
+tuxi -r -u $(cat $DEST/query.txt) > $DEST/result.txt
 
-grep "http*" ~/result.txt | rofi -dmenu -p "Here are some links" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+grep "http*" $DEST/result.txt | rofi -dmenu -p "Here are some links" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
 }
 
 #######################
@@ -82,11 +85,11 @@ grep "http*" ~/result.txt | rofi -dmenu -p "Here are some links" -font "Source C
 #######################
 notif_only() {
 
-rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > $DEST/query.txt
 
-tuxi -r $(cat ~/query.txt) > ~/result.txt 
+tuxi -r $(cat $DEST/query.txt) > $DEST/result.txt 
 
-notify-send "$(cat ~/result.txt)"
+notify-send "$(cat $DEST/result.txt)"
 }
 
 ####################
@@ -96,24 +99,29 @@ notify-send "$(cat ~/result.txt)"
 ####################
 verbose() {
 
-rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > $DEST/query.txt
 
-echo "$(cat ~/query.txt)"
+echo "$(cat $DEST/query.txt)"
 
-tuxi -r $(cat ~/query.txt) > ~/result.txt  
+tuxi -r $(cat $DEST/query.txt) > $DEST/result.txt  
 
-notify-send -t 60000 "$(cat ~/result.txt)"
+notify-send -t 60000 "$(cat $DEST/result.txt)"
 
-if grep -q "Hi, I'm Tuxi" ~/result.txt; then 
+if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then 
        echo "no query given"
 fi
 
-if grep -q "No Result!" ~/result.txt; then
+if grep -q "No Result!" $DEST/result.txt; then
           echo "no results found"
 fi
 
 }
 
+#########################
+#                       #
+#     install tuxi      #
+#                       #
+#########################
 install_tuxi() {
 
 cd 
@@ -135,7 +143,7 @@ exit 0
 #       Options       #
 #                     #
 #######################
-while getopts "hunvi" OPT; do
+while getopts "hunvid" OPT; do
 	case "$OPT" in 
         h) 
 	   help_dialouge
@@ -157,6 +165,10 @@ while getopts "hunvi" OPT; do
            install_tuxi
            exit 0
            ;;
+        d)
+           DEST="$2"
+           shift
+           ;;
       esac
 done     
 
@@ -165,23 +177,23 @@ done
 #       no flag code        #  
 #                           #
 #############################
-rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > $DEST/query.txt
 
-tuxi -r $(cat ~/query.txt) > ~/result.txt  
+tuxi -r $(cat $DEST/query.txt) > $DEST/result.txt  
 
 sleep 1
 
-if grep -q "Hi, I'm Tuxi" ~/result.txt; then 
+if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then 
 	exit 0
 fi
 
-if grep -q "No Result!" ~/result.txt; then
-   grep "http*" ~/result.txt | rofi -dmenu -p "No result found, choose a link if you would like" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+if grep -q "No Result!" $DEST/result.txt; then
+   grep "http*" $DEST/result.txt | rofi -dmenu -p "No result found, choose a link if you would like" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
    exit 0
 else
-notify-send -t 60000 "$(cat ~/result.txt)"
+notify-send -t 60000 "$(cat $DEST/result.txt)"
 sleep 2
-tuxi -r -u $(cat ~/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
 fi
 
  
