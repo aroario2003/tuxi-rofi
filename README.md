@@ -6,7 +6,7 @@ This project was inspired by Bugswritter and his recent development by the name 
 
 ## Disclaimer
 
-To be clear, I take no credit for tuxi in the slightest and all I intend to do is extend it's funtionality. This script is still the early stages of development and I plan on extending its funstionality much further in the near future. My bash scripting is far from good, so any constructive criticsm is appreciated. 
+To be clear, I take no credit for tuxi in the slightest and all I intend to do is extend it's funtionality. This script is still in the early stages of development and I plan on extending its funstionality much further in the near future. My bash scripting is far from good, so any constructive criticsm is appreciated. 
 
 ## Dependencies
 
