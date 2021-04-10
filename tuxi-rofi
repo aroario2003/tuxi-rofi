@@ -145,30 +145,30 @@ exit 0
 #######################
 while getopts "hunvid" OPT; do
 	case "$OPT" in 
-        h) 
+    h) 
 	   help_dialouge
 	   exit 0
 	   ;;
 	u) 
-           url_print
+       url_print
 	   exit 0
 	   ;;
 	n)
 	   notif_only
-           exit 0
-           ;;
-        v) 
-           verbose
-           exit 0
-           ;;
-        i)
-           install_tuxi
-           exit 0
-           ;;
-        d)
-           DEST="$2"
-           shift
-           ;;
+       exit 0
+       ;;
+    v) 
+       verbose
+       exit 0
+       ;;
+    i)
+       install_tuxi
+       exit 0
+       ;;
+    d)
+      DEST="$2"
+      shift
+      ;;
       esac
 done     
 
