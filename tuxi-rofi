@@ -1,0 +1,188 @@
+###########
+#!/bin/sh 
+###########
+
+############################################                                          
+#  _              _                  __ _  #
+# | |_ _   ___  _(_)      _ __ ___  / _(_) #
+# | __| | | \ \/ / |_____| '__/ _ \| |_| | #
+# | |_| |_| |>  <| |_____| | | (_) |  _| | #
+#  \__|\__,_/_/\_\_|     |_|  \___/|_| |_| #
+#                                          # 
+# By: Alejandro Rosario                    #
+# Date: 4/8/21                             #
+############################################                                        
+
+######################################################################################################################
+#tuxi-rofi is an extension of the tuxi script written by BugsWritter,                                                #
+#all credit goes to him for writting that script.                                                                    #
+#This script intends to be an extension of his script and make it easier for tuxi to be a part of everyones workflow.# 
+######################################################################################################################
+
+####################
+#                  #
+#   colors help    #
+#                  # 
+####################
+green="\033[1;32m"
+yellow="\033[1;33m"
+white="\033[0m"
+blue="\033[1;31m"
+
+##########################
+#                        #
+#      colors rofi       #
+#                        #
+##########################
+color1="#04152E"
+color2="#ffffff"
+color3="#04152E"
+color4="#2E93A7"
+color5="#ffffff"
+color6="#04152E"
+color7="#005fff"
+color8="#00B2FE"
+
+###################
+#                 #
+#  help message   #
+#                 # 
+###################
+help_dialouge() {
+
+	printf "This script was written in order to encourage people to stop using the evil search engine known as google. I know this does query google but at least they do not get your valuable information when you search something with this script.\n"
+	printf " %bOptions:%b\n" "$yellow"
+	printf "   %b-h%b              %bPrint this text%b\n" "$green" "$white"
+	printf "   %b-u%b              %bPrint only the URL's for the given query%b\n" "$green" "$white"
+	printf "   %b-n%b              %bPrint only the result found by tuxi, no links%b\n" "$green" "$white"
+        printf "   %b-v%b              %bPrint output mainly to the terminal, this option is meant for debugging%b\n" "$green" "$white"
+        printf "   %b-i%b              %bInstall tuxi on your system%b\n" "$green" "$white"
+        printf "%bCredit for Tuxi goes to BugsWritter at%b %bhttps://github.com/Bugswriter/tuxi\n%b" "$yellow" "$blue"
+
+}
+
+##################
+#                #
+#   print urls   #
+#                #
+##################
+url_print() {
+
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "Search: " -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+
+tuxi -r -u $(cat ~/query.txt) > ~/result.txt
+
+grep "http*" ~/result.txt | rofi -dmenu -p "Here are some links" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+}
+
+#######################
+#                     # 
+#  notification only  #
+#                     # 
+#######################
+notif_only() {
+
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+
+tuxi -r $(cat ~/query.txt) > ~/result.txt 
+
+notify-send "$(cat ~/result.txt)"
+}
+
+####################
+#                  #
+#  verbose output  #
+#                  #
+####################
+verbose() {
+
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+
+echo "$(cat ~/query.txt)"
+
+tuxi -r $(cat ~/query.txt) > ~/result.txt  
+
+notify-send -t 60000 "$(cat ~/result.txt)"
+
+if grep -q "Hi, I'm Tuxi" ~/result.txt; then 
+       echo "no query given"
+fi
+
+if grep -q "No Result!" ~/result.txt; then
+          echo "no results found"
+fi
+
+}
+
+install_tuxi() {
+
+cd 
+
+git clone https://github.com/Bugswriter/tuxi.git
+
+cd tuxi
+
+sudo make install
+
+echo "tuxi has been installed!"
+
+exit 0
+
+}
+
+#######################
+#                     #
+#       Options       #
+#                     #
+#######################
+while getopts "hunvi" OPT; do
+	case "$OPT" in 
+        h) 
+	   help_dialouge
+	   exit 0
+	   ;;
+	u) 
+           url_print
+	   exit 0
+	   ;;
+	n)
+	   notif_only
+           exit 0
+           ;;
+        v) 
+           verbose
+           exit 0
+           ;;
+        i)
+           install_tuxi
+           exit 0
+           ;;
+      esac
+done     
+
+#############################
+#                           #
+#       no flag code        #  
+#                           #
+#############################
+rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "search: " -font "source code pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" > ~/query.txt
+
+tuxi -r $(cat ~/query.txt) > ~/result.txt  
+
+sleep 1
+
+if grep -q "Hi, I'm Tuxi" ~/result.txt; then 
+	exit 0
+fi
+
+if grep -q "No Result!" ~/result.txt; then
+   grep "http*" ~/result.txt | rofi -dmenu -p "No result found, choose a link if you would like" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+   exit 0
+else
+notify-send -t 60000 "$(cat ~/result.txt)"
+sleep 2
+tuxi -r -u $(cat ~/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+fi
+
+ 
+
