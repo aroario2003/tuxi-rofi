@@ -16,8 +16,7 @@ To be clear, I take no credit for tuxi in the slightest and all I intend to do i
 
 ## Installation
 
-At the moment, I have no makefile which means you will have to move the script to either `/usr/bin` or `~/.local/bin`, whichever you prefer. I plan on adding a makefile in the near future and making the installation process more automated. 
-However, `tuxi-rofi` does include the `-i` flag which will install tuxi for you if you desire, otherwise checkout the [tuxi](https://github.com/Bugswriter/tuxi) repository for information about how to install it. 
+ You can use the [Makefile](./Makefile) to install `tuxi-rofi`. Also, `tuxi-rofi` does include the `-i` flag which will install tuxi for you if you desire, otherwise checkout the [tuxi](https://github.com/Bugswriter/tuxi) repository for information about how to install it. 
 
 ## Dmenu functionality
 
