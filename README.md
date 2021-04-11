@@ -21,10 +21,16 @@ However, `tuxi-rofi` does include the `-i` flag which will install tuxi for you 
 
 ## Dmenu functionality
 
-Since I use rofi as my run launcher, I did not make this script with dmenu users in mind, However, I will be adding a flag so that dmenu users can also use this script without having to worry about learning to use rofi and configure it. 
+Since I use rofi as my run launcher, I did not make this script with dmenu users in mind, However, you can use dmenu with the `-D` or `-a` flag. The difference between the two flags is that `-D` gives you the notification with the result to your query and the links related to the query whereas the `-a` flag only gives you a notification. I will be working on a flag to only give the links related to the given query in the coming days. 
 
 ## More information
 
 At the moment, this script does not have a man page but I will be making one at some point in the future to make use of the script easier, However, for the time being you can use the `-h` flag in order to see all possible functions of the script. 
 
+## Updates
 
+As of today **4/11/21**, I have added two dmenu flags in order to make the flag compatible with dmenu and also be available to strict suckless users. I Will be adding more functionality with dmenu in the coming days and weeks as I have the time. In the coming days and weeks I will also be working on a makefile and a man page for this scirpt so that it is easier to install and use. 
+
+## License
+
+This project is licensed under the [GPL-3.0](./LICENSE).
