@@ -29,7 +29,7 @@ At the moment, this script does not have a man page but I will be making one at 
 
 ## Updates
 
-As of today **4/11/21**, I have added two dmenu flags in order to make the flag compatible with dmenu and also be available to strict suckless users. I Will be adding more functionality with dmenu in the coming days and weeks as I have the time. In the coming days and weeks I will also be working on a makefile and a man page for this scirpt so that it is easier to install and use. 
+As of today **4/11/21**, I have added two dmenu flags in order to make the script compatible with dmenu and also be available to strict suckless users. I Will be adding more functionality with dmenu in the coming days and weeks as I have the time. In the coming days and weeks I will also be working on a makefile and a man page for this scirpt so that it is easier to install and use. 
 
 ## License
 
