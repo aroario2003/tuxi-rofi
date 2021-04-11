@@ -65,6 +65,8 @@ help_dialouge() {
         printf "   %b-v%b              %bPrint output mainly to the terminal, this option is meant for debugging%b\n" "$green" "$white"
         printf "   %b-i%b              %bInstall tuxi on your system%b\n" "$green" "$white"
         printf "   %b-d%b              %bSet the destination for files result.txt and query.txt to be put, make sure that this flag is the first argument if being used!\n%b" "$green" "$white"
+        printf "   %b-D%b              %bUse dmenu instead of rofi for link output\n%b" "$green" "$white"
+        printf "   %b-a%b              %bUse dmenu and only give notification\n%b" "$green" "$white"
         printf "%bCredit for Tuxi goes to BugsWritter at%b %bhttps://github.com/Bugswriter/tuxi\n%b" "$yellow" "$blue"
 
 }
@@ -119,7 +121,6 @@ fi
 if grep -q "No Result!" $DEST/result.txt; then
           echo "no results found"
 fi
-
 }
 
 #########################
@@ -143,12 +144,65 @@ exit 0
 
 }
 
+#########################
+#                       #  
+# Dmenu instead of rofi #
+#                       #
+#########################
+use_dmenu() {
+
+cat $DEST/empty.txt | dmenu -p "Search" > $DEST/query.txt 
+
+tuxi -r $(cat $DEST/query.txt) > $DEST/result.txt
+
+if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then 
+	exit 0
+fi
+
+sleep 1
+
+if grep -q "No Result!" $DEST/result.txt; then
+   grep "http*" $DEST/result.txt | dmenu -p "No result, here are some links" -l 20 | xargs -r brave
+else
+notify-send "$(cat $DEST/result.txt)"
+sleep 2
+tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | dmenu -p "Here are some links with more information" -l 20 | xargs -r brave
+fi 
+}
+
+################################
+#                              #
+# dmenu with only notification #
+#                              #
+################################
+dmenu_notif() {
+
+touch $DEST/empty.txt
+
+cat $DEST/empty.txt | dmenu -p "Search" > $DEST/query.txt 
+
+tuxi -r $(cat $DEST/query.txt) > $DEST/result.txt
+
+if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then 
+	exit 0
+fi
+
+if grep -q "No Result!" $DEST/result.txt; then
+    notify-send "No result"
+    exit 0  
+fi
+
+
+    notify-send "$(cat $DEST/result.txt)"
+
+}
+
 #######################
 #                     #
 #       Options       #
 #                     #
 #######################
-while getopts "hunvid" OPT; do
+while getopts "hunvidDa" OPT; do
 	case "$OPT" in 
         h|help) 
 	   help_dialouge
@@ -173,6 +227,14 @@ while getopts "hunvid" OPT; do
         d|destination)
            DEST="$2"
            shift
+           ;;
+        D|dmenu)
+           use_dmenu
+           exit 0
+           ;;
+        a)
+           dmenu_notif
+           exit 0
            ;;
       esac
 done     
@@ -200,6 +262,7 @@ notify-send -t 60000 "$(cat $DEST/result.txt)"
 sleep 2
 tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
 fi
+
 
  
 
