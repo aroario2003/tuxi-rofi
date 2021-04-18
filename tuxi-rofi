@@ -26,6 +26,7 @@
 #####################
 DEST="/home/$USER"
 TIMEOUT="60000"
+BROWSER="brave"
 
 ####################
 #                  #
@@ -35,7 +36,8 @@ TIMEOUT="60000"
 green="\033[1;32m"
 yellow="\033[1;33m"
 white="\033[0m"
-blue="\033[1;31m"
+blue="\033[1;36m"
+red="\033[1;31m"
 
 ##########################
 #                        #
@@ -51,6 +53,15 @@ color6="#04152E"
 color7="#005fff"
 color8="#00B2FE"
 
+##########################
+#                        #
+#  Enviroment variables  #
+#                        # 
+##########################
+[ -n "$TUXI_ROFI_BROWSER" ] && BROWSER="$TUXI_ROFI_BROWSER" 
+[ -n "$TUXI_ROFI_TIMEOUT" ] && TIMEOUT="$TUXI_ROFI_TIMEOUT"
+[ -n "$TUXI_ROFI_DESTINATION" ] && DEST="$TUXI_ROFI_DESTINATION" 
+
 ###################
 #                 #
 #  help message   #
@@ -59,17 +70,30 @@ color8="#00B2FE"
 help_dialouge() {
     printf " %bUsage:%b %btuxi-rofi%b " "$yellow" "$green" 
         printf "%b[Option(s)]\n%b" "$blue"
-	printf " %bOptions:%b\n" "$yellow"
+	printf "%bOptions:%b\n" "$blue"
 	printf "   %b-h%b              %bPrint this text%b\n" "$green" "$white"
 	printf "   %b-u%b              %bPrint only the URL's for the given query%b\n" "$green" "$white"
 	printf "   %b-n%b              %bPrint only the result found by tuxi, no links%b\n" "$green" "$white"
         printf "   %b-v%b              %bPrint output mainly to the terminal, this option is meant for debugging%b\n" "$green" "$white"
         printf "   %b-i%b              %bInstall tuxi on your system%b\n" "$green" "$white"
-        printf "   %b-d%b              %bSet the destination for files result.txt and query.txt to be put\n%b" "$green" "$white"
+        printf "   %b-d%b              %bSet the destination for files result.txt, query.txt and history.txt to be put\n%b" "$green" "$white"
         printf "   %b-D%b              %bUse dmenu instead of rofi for link output\n%b" "$green" "$white"
         printf "   %b-a%b              %bUse dmenu and only give notification\n%b" "$green" "$white"
         printf "   %b-l%b              %bUse dmenu and only give the links related to the query\n%b" "$green" "$white"
         printf "   %b-t%b              %bSpecify the timeout for notifications\n%b" "$green" "$white"
+        printf "   %b-b%b              %bSpecify the browser you would like to use for opening links\n%b" "$green" "$white"
+      printf "%bLong flags available:\n%b" "$blue"
+        printf " %b--help%b                     %bSame as -h\n%b" "$green" "$white"
+        printf " %b--verbose%b                  %bSame as -v\n%b" "$green" "$white"
+        printf " %b--install-tuxi%b             %bSame as -i\n%b" "$green" "$white"
+        printf " %b--notification-only%b        %bSame as -n\n%b" "$green" "$white" 
+        printf " %b--dmenu-links%b              %bSame as -l\n%b" "$green" "$white"
+        printf " %b--use-dmenu%b                %bSame as -D\n%b" "$green" "$white"
+        printf " %b--dmenu-notification%b       %bSame as -a\n%b" "$green" "$white"
+      printf "%bEnvironment Variables:\n%b" "$blue"
+        printf " %bTUXI_ROFI_BROWSER%b          %bSet the browser you would like tuxi-rofi to use\n%b" "$green" "$white"
+        printf " %bTUXI_ROFI_TIMEOUT%b          %bSet the timeout of notifications\n%b" "$green" "$white"
+        printf " %bTUXI_ROFI_DESTINATION%b      %bSet the destination for files created by tuxi-rofi\n%b" "$green" "$white"
         printf "%bCredit for Tuxi goes to BugsWritter at%b %bhttps://github.com/Bugswriter/tuxi\n%b" "$yellow" "$blue"
 
 }
@@ -85,7 +109,7 @@ rofi -width 30 -dmenu -lines 0 -yoffset -450 -p "Search: " -font "Source Code Pr
 
 tuxi -r -u $(cat $DEST/query.txt) > $DEST/result.txt
 
-grep "http*" $DEST/result.txt | rofi -dmenu -p "Here are some links" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+grep "http*" $DEST/result.txt | rofi -dmenu -p "Here are some links" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r $BROWSER
 }
 
 #######################
@@ -119,10 +143,12 @@ notify-send -t $TIMEOUT "$(cat $DEST/result.txt)"
 
 if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then 
        echo "no query given"
+       exit 0
 fi
 
 if grep -q "No Result!" $DEST/result.txt; then
           echo "no results found"
+          exit 0
 fi
 }
 
@@ -167,11 +193,11 @@ fi
 sleep 1
 
 if grep -q "No Result!" $DEST/result.txt; then
-   grep "http*" $DEST/result.txt | dmenu -p "No result, here are some links" -l 20 | xargs -r brave
+   grep "http*" $DEST/result.txt | dmenu -p "No result, here are some links" -l 20 | xargs -r $BROWSER
 else
 notify-send -t $TIMEOUT "$(cat $DEST/result.txt)"
 sleep 2
-tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | dmenu -p "Here are some links with more information" -l 20 | xargs -r brave
+tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | dmenu -p "Here are some links with more information" -l 20 | xargs -r $BROWSER
 fi 
 }
 
@@ -213,9 +239,9 @@ touch $DEST/empty.txt
 
 cat $DEST/empty.txt | dmenu -p "Search" > $DEST/query.txt 
 
-tuxi -r -u $(cat $DEST/query.txt) > result.txt
+tuxi -r -u $(cat $DEST/query.txt) > $DEST/result.txt
 
-grep "http*" $DEST/result.txt | dmenu -p "Here are the links" -l 20 | xargs -r brave
+grep "http*" $DEST/result.txt | dmenu -p "Here are the links" -l 20 | xargs -r $BROWSER
 
 }
 
@@ -224,48 +250,88 @@ grep "http*" $DEST/result.txt | dmenu -p "Here are the links" -l 20 | xargs -r b
 #       Options       #
 #                     #
 #######################
-while getopts "hunvid:Dalt:" OPT; do
+
+  while getopts ":hunvid:Dalt:b:H-:" OPT; do
 	case "$OPT" in 
-        h|help) 
+       -)
+         case ${OPTARG} in
+           use-dmenu)
+               use_dmenu
+               exit 0
+               ;;
+           dmenu-notification)
+               dmenu_notif
+               exit 0
+               ;;
+           dmenu-links)
+               dmenu_links  
+               exit 0
+               ;;
+           help)
+               help_dialouge
+               exit 0
+               ;;
+           install-tuxi)
+               install_tuxi
+               exit 0
+               ;;
+           notification-only)
+               notif_only
+               exit 0
+               ;;
+           verbose)
+               verbose
+               exit 0
+               ;;
+         esac;;
+        h) 
 	   help_dialouge
 	   exit 0
 	   ;;
-	u|url) 
+	u) 
            url_print
 	   exit 0
 	   ;;
-	n|notification)
+	n)
 	   notif_only
            exit 0
            ;;
-        v|verbose) 
+        v) 
            verbose
            exit 0
            ;;
-        i|install-tuxi)
+        i)
            install_tuxi
            exit 0
            ;;
-        d|destination)
+        d)
            DEST=$OPTARG
            ;;
-        D|dmenu)
+        D)
            use_dmenu
            exit 0
            ;;
-        a|dmenu-notification)
+        a)
            dmenu_notif
            exit 0
            ;;
-        l|dmenu-links)
+        l)
            dmenu_links
            exit 0
            ;;
-        t|timeout)
+        t)
            TIMEOUT=$OPTARG
+           ;;
+        b)
+           BROWSER=$OPTARG
+           ;; 
+        ?)
+           printf "%binvalid option!\n%b" "$red" 
+           exit 0
            ;;
       esac
 done     
+shift $((OPTIND-1))
 
 #############################
 #                           #
@@ -283,12 +349,12 @@ if grep -q "Hi, I'm Tuxi" $DEST/result.txt; then
 fi
 
 if grep -q "No Result!" $DEST/result.txt; then
-   grep "http*" $DEST/result.txt | rofi -dmenu -p "No result found, choose a link if you would like" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+   grep "http*" $DEST/result.txt | rofi -dmenu -p "No result found, choose a link if you would like" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r $BROWSER
    exit 0
 else
 notify-send -t $TIMEOUT "$(cat $DEST/result.txt)"
 sleep 2
-tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r brave
+tuxi -r -u $(cat $DEST/query.txt) | grep "http*" | rofi -dmenu -p "Here are some links with more information" -font "Source Code Pro 11" -color-normal "$color1,$color2,$color3,$color4,$color5" -color-window "$color6,$color7,$color8" | xargs -r $BROWSER
 fi
 
 
