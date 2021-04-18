@@ -24,7 +24,7 @@ Since I use rofi as my run launcher, I did not make this script with dmenu users
 
 ## Environment Variables
 
-In order to use the environment variables that this script supports as mentioned in the **Updates** section you must export them in your `zshrc`,`.bashrc` or `config.fish`. 
+In order to use the environment variables that this script supports as mentioned in the **Updates** section you must export them in your `.zshrc` , `.bashrc` or `config.fish`. 
 
 ## More information
 
