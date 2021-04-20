@@ -1,6 +1,12 @@
 <div align="center"> 
 
-# tuxi-rofi 
+# Tuxi-Rofi 
+
+</div>
+
+<div align="center">
+
+A script to make TUXI more functional
 
 </div>
 
