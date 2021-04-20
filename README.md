@@ -1,4 +1,4 @@
-# tuxi-rofi
+<h1 align="center" tuxi-rofi </h1>
 
 ## What is it?
 
